@@ -89,9 +89,8 @@ void setup()
                             0);                   /* pin task to core 0 */
     delay(100);
 
-    ossm.findHome();
-
-    //ossm.setRunMode();
+    // Start Stroke Engine and home the machine sensorless
+    ossm.startStrokeEngine();
 
     // Kick off the http and motion tasks - they begin executing as soon as they
     // are created here! Do not change the priority of the task, or do so with

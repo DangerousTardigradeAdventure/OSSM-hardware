@@ -116,16 +116,31 @@ float calculateSensation(float sensationPercentage)
     return float((sensationPercentage * 200.0) / 100.0) - 100.0f;
 }
 
+// Starts up Stroke Engine
+// Blocks until Stroke Engine has started up and the machine has been homed
+void OSSM::startStrokeEngine()
+{
+    // Set up Stroke Engine
+    OssmUi::UpdateMessage("Initializing Stroke Engine");
+    machineGeometry strokingMachine = {.physicalTravel = abs(maxStrokeLengthMm), .keepoutBoundary = 6.0};
+    Stroker.begin(&strokingMachine, &servoMotor);
+
+    // Home the machine sensorless
+    sensorlessHomeProperties homeProperties = {.currentPin = 36, .currentLimit = 1.5};
+    Stroker.enableAndSensorlessHome(&homeProperties, 25);
+
+    // Wait for the machine to home
+    // TODO: Use callback instead of polling
+    while(Stroker.getState() != READY){}
+
+    // Pull the calibrated maximum travel from Stroke Engine
+    maxStrokeLengthMm = Stroker.getMaxDepth();
+
+    OssmUi::UpdateMessage("Stroke Engine ready!");
+}
+
 [[noreturn]] void OSSM::runStrokeEngine()
 {
-    stepper.stopService();
-
-    machineGeometry strokingMachine = {.physicalTravel = abs(maxStrokeLengthMm), .keepoutBoundary = 6.0};
-    StrokeEngine Stroker;
-
-    Stroker.begin(&strokingMachine, &servoMotor);
-    Stroker.thisIsHome();
-
     float lastSpeedPercentage = speedPercentage;
     float lastStrokePercentage = strokePercentage;
     float lastDepthPercentage = depthPercentage;
@@ -146,7 +161,6 @@ float calculateSensation(float sensationPercentage)
 
     for (;;)
     {
-        Serial.println("looping");
         if (isChangeSignificant(lastSpeedPercentage, speedPercentage))
         {
             Serial.printf("changing speed: %f\n", speedPercentage * 3);
@@ -228,18 +242,25 @@ float calculateSensation(float sensationPercentage)
             lastSensationPercentage = sensationPercentage;
         }
 
+        // Handle changing patterns
         if (!modeChanged && changePattern != 0)
         {
-            strokePattern += changePattern;
+            // Calculate the new pattern index
+            int newStrokePattern = strokePattern + changePattern;
 
-            if (strokePattern < 0)
+            if (newStrokePattern < 0)
             {
-                strokePattern = Stroker.getNumberOfPattern() - 1;
+                // If the new index is negative, roll over to the top-most pattern
+                newStrokePattern = Stroker.getNumberOfPattern() - 1;
             }
-            else if (strokePattern >= Stroker.getNumberOfPattern())
+            else if (newStrokePattern >= Stroker.getNumberOfPattern())
             {
-                strokePattern = 0;
+                // If the new index is greater than the number of patterns, reset to 0
+                newStrokePattern = 0;
             }
+
+            // Assign the new pattern index
+            strokePattern = newStrokePattern;
 
             Serial.println(Stroker.getPatternName(strokePattern));
 

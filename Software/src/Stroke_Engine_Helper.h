@@ -24,7 +24,7 @@ static motorProperties servoMotor{
     .maxSpeed = 60 * (hardcode_maxSpeedMmPerSecond / (hardcode_pulleyToothCount * hardcode_beltPitchMm)),
     .maxAcceleration = 10000,
     .stepsPerMillimeter = hardcode_motorStepPerRevolution / (hardcode_pulleyToothCount * hardcode_beltPitchMm),
-    .invertDirection = true,
+    .invertDirection = false,
     .enableActiveLow = true,
     .stepPin = MOTOR_STEP_PIN,
     .directionPin = MOTOR_DIRECTION_PIN,

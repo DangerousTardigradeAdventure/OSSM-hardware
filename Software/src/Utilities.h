@@ -71,7 +71,7 @@ class OSSM
     bool wifiControlActive = false;
 
     float speedPercentage = 0;   // percentage 0-100
-    float depthPercentage = 100; // percentage 0-100
+    float depthPercentage = 50; // percentage 0-100
     float strokePercentage = 10; // percentage 0-100
     bool isStopped = false;
     float sensationPercentage = 40; // percentage 0-100, maps to sensation -100 - 100, so 40 default = -20 sensation
@@ -83,6 +83,8 @@ class OSSM
 
     String strokerPatternName = "Default";  // The name of the current stroke engine pattern
 
+    StrokeEngine Stroker;
+
     OSSM()
         : g_encoder(ENCODER_A, ENCODER_B),
           g_ui() // this just creates the objects with parameters
@@ -91,6 +93,7 @@ class OSSM
 
     void setup();
     void handleStopCondition(); // handles e-stop condition
+    void startStrokeEngine();   // Starts Stroke Engine running
     [[noreturn]] void runPenetrate();        // runs actual penetration motion one cycle
     [[noreturn]] void runStrokeEngine();     // runs stroke Engine
     String getPatternJSON(StrokeEngine Stroker);
