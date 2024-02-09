@@ -154,7 +154,8 @@ void OSSM::startStrokeEngine()
     Stroker.setPattern(int(strokePattern), true);
     Stroker.setDepth(0.01f * depthPercentage * abs(maxStrokeLengthMm), true);
     Stroker.setStroke(0.01f * strokePercentage * abs(maxStrokeLengthMm), true);
-    Stroker.moveToMax(10 * 3);
+    //Stroker.moveToMax(10 * 3);
+    Stroker.moveToMin(10 * 3);  //armpit 02.09.2024 - This corrects "moving to full depth after homing" issue
     Serial.println(Stroker.getState());
 
     strokerPatternName = Stroker.getPatternName(strokePattern); // Set the initial stroke engine pattern name
@@ -188,7 +189,7 @@ void OSSM::startStrokeEngine()
                 Stroker.setPattern(int(strokePattern), false); // Pattern, index must be < Stroker.getNumberOfPattern()
             }
 
-            
+
             if (buttonPressCount > 1)   // Enter pattern-selection mode if the button is pressed more than once
             {
                 rightKnobMode = MODE_PATTERN;
