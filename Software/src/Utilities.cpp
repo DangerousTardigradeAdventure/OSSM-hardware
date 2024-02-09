@@ -149,12 +149,12 @@ void OSSM::startStrokeEngine()
     strokePattern = 0;
     strokePatternCount = Stroker.getNumberOfPattern();
 
+    // Preset the Stroke Engine parameters
     Stroker.setSensation(calculateSensation(sensationPercentage), true);
-
     Stroker.setPattern(int(strokePattern), true);
     Stroker.setDepth(0.01f * depthPercentage * abs(maxStrokeLengthMm), true);
     Stroker.setStroke(0.01f * strokePercentage * abs(maxStrokeLengthMm), true);
-    Stroker.moveToMax(10 * 3);
+
     Serial.println(Stroker.getState());
 
     strokerPatternName = Stroker.getPatternName(strokePattern); // Set the initial stroke engine pattern name
